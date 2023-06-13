@@ -8,5 +8,6 @@ router.get("/", controllers.getAll)
 .delete("/:id", controllers.deleteUserById)
 .patch("/:id", controllers.updateUserById)
 .get("/:id", controllers.findUserById)
+.post("/login", controllers.login)
 
 export default router;

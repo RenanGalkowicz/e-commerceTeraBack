@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import UserSchema from "../models/userSchema.js";
+import userService from "../service/userService.js"
 
 //MONTAR O NOSSO CRUD
 
@@ -29,8 +30,10 @@ const getAll = async (req, res) => {
 
 // criar um novo usuário na database
 const createUser = async (req, res) => {
-  const hash = bcrypt.hashSync(req.body.password, 10);
+  const salt = bcrypt.genSaltSync();
+  const hash = bcrypt.hashSync(req.body.password, salt);
   req.body.password = hash;
+  req.body.salt = salt;
 
   try {
     const newUser = new UserSchema(req.body);
@@ -110,10 +113,23 @@ const findUserById = async (req, res) => {
   }
 };
 
+const login = async (req, res, next) => {
+  const credentials = req.body;
+  try {
+      const response = await userService
+          .login(credentials.email, credentials.password);
+
+      res.status(200).send(response);
+  } catch (error) {
+      res.status(403).send(error);
+  }
+}
+
 export default {
   getAll,
   createUser,
   updateUserById,
   deleteUserById,
   findUserById,
+  login,
 };
